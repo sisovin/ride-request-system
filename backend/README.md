@@ -76,8 +76,6 @@ Common utilities and configurations used across services:
 - Database configurations
 - Environment settings
 
-```
-
 ## Project Structure
 
 ```
