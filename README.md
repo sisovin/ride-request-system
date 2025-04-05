@@ -6,7 +6,6 @@ This project is a ride request system that includes various services for handlin
 
 ## Project Structure
 
-```
 This is a comprehensive file/folder structure for your ride request system that includes payment services, admin functionality, authentication with multiple providers, and shared components between apps.
 
 Here's the file/folder structure:
