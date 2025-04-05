@@ -2,144 +2,207 @@
 
 ## Project Overview
 
-This project is a ride request system that includes various services for handling ride requests, driver assignments, notifications, analytics, and more. The system is designed to be scalable and maintainable.
+This project is a ride request system that includes various services for handling ride requests, driver assignments, notifications, analytics, and more. The system is designed to be scalable and maintainable, using modern technologies and best practices.
 
 ## Project Structure
 
 ```
+This is a comprehensive file/folder structure for your ride request system that includes payment services, admin functionality, authentication with multiple providers, and shared components between apps.
+
+Here's the file/folder structure:
+
+```
 ride-request-system/
-│
 ├── backend/
-│   ├── gateway-service/           # Handles API requests & authentication
-│   │   ├── controllers/
-│   │   │   ├── rideController.js  # API endpoints for ride requests
-│   │   │   ├── authController.js  # JWT authentication logic
-│   │   ├── routes/
-│   │   │   ├── rideRoutes.js      # Ride request API routes
-│   │   │   ├── authRoutes.js      # Auth routes (login, signup)
-│   │   ├── middleware/
-│   │   │   ├── authMiddleware.js  # Middleware for authentication
-│   │   ├── services/
-│   │   │   ├── webSocketService.js # Handles WebSocket communication
-│   │   ├── config/
-│   │   │   ├── kafka.js           # Kafka producer setup
-│   │   │   ├── redis.js           # Redis connection for caching
-│   │   ├── app.js                 # Express app initialization
-│   │   ├── server.js              # Server entry point
-│
-│   ├── websocket-service/         # WebSocket server for real-time updates
-│   │   ├── handlers/
-│   │   │   ├── rideHandler.js      # Handles real-time ride updates
-│   │   ├── services/
-│   │   │   ├── socketService.js    # Manages WebSocket connections
-│   │   ├── config/
-│   │   │   ├── redis.js            # Stores active WebSocket connections
-│   │   ├── server.js               # WebSocket server
-│
-│   ├── kafka-service/              # Kafka-based event processing
-│   │   ├── producers/
-│   │   │   ├── rideProducer.js      # Publishes ride requests to Kafka
-│   │   ├── consumers/
-│   │   │   ├── rideConsumer.js      # Consumes ride request events
-│   │   ├── config/
-│   │   │   ├── kafkaConfig.js       # Kafka connection setup
-│
-│   ├── ride-service/               # Core ride management logic
-│   │   ├── controllers/
-│   │   │   ├── rideController.js    # Processes ride requests
-│   │   ├── services/
-│   │   │   ├── rideService.js       # Business logic for ride handling
-│   │   │   ├── mappingService.js    # Calls third-party mapping APIs
+│   ├── gateway-service/                   # API Gateway
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── middlewares/
+│   │   │   │   ├── auth/                  # Authentication middleware
+│   │   │   │   ├── rateLimit.js
+│   │   │   ├── routes/
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── ride-service/                      # Handles ride requests
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   │   ├── events/                    # Event publishers/subscribers
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── driver-assignment-service/         # Matches riders with drivers
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   │   │   ├── matching-algorithm.js
+│   │   │   ├── events/
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── websocket-service/                 # Real-time communication
+│   │   ├── src/
+│   │   │   ├── handlers/
+│   │   │   ├── events/
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── auth-service/                      # Authentication service
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   │   │   ├── jwt.js
+│   │   │   │   ├── oauth.js               # OAuth providers
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── payment-service/                   # Payment processing
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── models/
+│   │   │   ├── services/
+│   │   │   │   ├── aba.js                 # ABA payment integration
+│   │   │   │   ├── bakong.js              # Bakong payment integration
+│   │   │   ├── events/
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── notification-service/              # Push notifications
+│   │   ├── src/
+│   │   │   ├── controllers/
+│   │   │   ├── services/
+│   │   │   ├── events/
+│   │   │   ├── index.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │
+│   ├── shared/                            # Shared backend code
 │   │   ├── models/
-│   │   │   ├── Ride.js              # Ride schema/model
-│   │   ├── database/
-│   │   │   ├── db.js                # Database connection setup
-│   │   ├── config/
-│   │   │   ├── mappingAPI.js        # External mapping service integration
-│
-│   ├── driver-assignment-service/   # Assigns drivers to rides
-│   │   ├── controllers/
-│   │   │   ├── driverController.js  # Assigns driver based on location
-│   │   ├── services/
-│   │   │   ├── assignmentService.js # Finds nearest driver
-│   │   │   ├── lockService.js       # Implements distributed lock
-│   │   ├── config/
-│   │   │   ├── redis.js             # Caches driver locations
-│   │   │   ├── kafka.js             # Handles assignment queue
-│
-│   ├── notification-service/        # Sends alerts to drivers and riders
-│   │   ├── services/
-│   │   │   ├── pushNotification.js  # Sends mobile push notifications
-│   │   │   ├── smsService.js        # Sends SMS alerts
-│   ├── config/
-│   │   │   ├── firebase.js          # Firebase setup for push notifications
-│   ├── workers/
-│   │   │   ├── notificationWorker.js # Background job for notifications
-│
-│   ├── analytics-service/           # Logs and monitors ride metrics
-│   │   ├── consumers/
-│   │   │   ├── rideAnalyticsConsumer.js # Listens for ride events
-│   │   ├── database/
-│   │   │   ├── analyticsDB.js        # Stores ride analytics
-│
-│   ├── shared/                      # Shared utilities and configs
+│   │   ├── middlewares/
 │   │   ├── utils/
-│   │   │   ├── logger.js             # Logging utility
-│   │   │   ├── errorHandler.js       # Global error handling
-│   │   ├── config/
-│   │   │   ├── dbConfig.js           # Database configurations
-│   │   │   ├── env.js                # Environment variables
+│   │   ├── constants/
+│   │   ├── package.json
 │
-├── frontend/                         # Mobile/Web apps for riders and drivers
-│   ├── rider-app/                    # Rider mobile app
+├── frontend/
+│   ├── rider-app/                         # Rider mobile app (React Native)
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   ├── screens/
+│   │   │   │   ├── auth/
+│   │   │   │   ├── home/
+│   │   │   │   ├── ride/
+│   │   │   │   ├── payment/
+│   │   │   │   ├── profile/
 │   │   │   ├── services/
-│   │   │   │   ├── rideService.js    # Calls ride request API
-│   │   │   │   ├── webSocket.js      # WebSocket client
-│   │   │   ├── App.js                # Entry point
-│   │   ├── package.json              # Dependencies
-│
-│   ├── driver-app/                   # Driver mobile app
+│   │   │   │   ├── rideService.js
+│   │   │   │   ├── webSocket.js
+│   │   │   │   ├── paymentService.js
+│   │   │   │   ├── authService.js
+│   │   │   ├── navigation/
+│   │   │   ├── utils/
+│   │   │   ├── App.js
+│   │   ├── package.json
+│   │   ├── app.json
+│   │
+│   ├── driver-app/                        # Driver mobile app (React Native)
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   ├── screens/
+│   │   │   │   ├── auth/
+│   │   │   │   ├── home/
+│   │   │   │   ├── assignments/
+│   │   │   │   ├── earnings/
+│   │   │   │   ├── profile/
 │   │   │   ├── services/
-│   │   │   │   ├── assignmentService.js # Fetch ride assignments
-│   │   │   │   ├── webSocket.js      # WebSocket client
-│   │   │   ├── App.js                # Entry point
-│   │   ├── package.json              # Dependencies
+│   │   │   │   ├── assignmentService.js
+│   │   │   │   ├── webSocket.js
+│   │   │   │   ├── earningsService.js
+│   │   │   │   ├── authService.js
+│   │   │   ├── navigation/
+│   │   │   ├── utils/
+│   │   │   ├── App.js
+│   │   ├── package.json
+│   │   ├── app.json
+│   │
+│   ├── admin-dashboard/                   # Admin web application
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   ├── pages/
+│   │   │   │   ├── auth/
+│   │   │   │   ├── dashboard/
+│   │   │   │   ├── rides/
+│   │   │   │   ├── drivers/
+│   │   │   │   ├── riders/
+│   │   │   │   ├── payments/
+│   │   │   │   ├── reports/
+│   │   │   ├── services/
+│   │   │   ├── utils/
+│   │   │   ├── App.js
+│   │   ├── package.json
+│   │
+│   ├── shared/                            # Shared frontend code
+│   │   ├── components/                    # Reusable UI components
+│   │   ├── hooks/                         # Custom React hooks
+│   │   ├── utils/                         # Utility functions
+│   │   ├── constants/                     # Shared constants
+│   │   ├── services/                      # Common service logic
+│   │   ├── package.json
 │
-├── infra/                             # Infrastructure & DevOps
-│   ├── docker/
-│   │   ├── Dockerfile.gateway         # Docker config for Gateway
-│   │   ├── Dockerfile.ride            # Docker config for Ride Service
-│   │   ├── docker-compose.yml         # Service composition
-│   ├── k8s/
-│   │   ├── deployment.yaml            # Kubernetes deployment
-│   ├── terraform/
-│   │   ├── main.tf                    # Terraform infrastructure setup
+├── infrastructure/                        # Infrastructure as code
+│   ├── docker-compose.yml                 # Local development setup
+│   ├── k8s/                               # Kubernetes manifests
+│   │   ├── deployments/
+│   │   ├── services/
+│   │   ├── ingress/
+│   │   ├── config-maps/
+│   │   ├── secrets/
 │
-├── docs/                              # Project documentation
-│   ├── architecture.md                # System design overview
-│   ├── api-spec.md                    # API specifications
-│   ├── kafka-events.md                # Kafka event schema
+├── ci-cd/                                 # CI/CD configuration
+│   ├── .github/
+│   │   ├── workflows/
+│   │   │   ├── build-test.yml
+│   │   │   ├── deploy-dev.yml
+│   │   │   ├── deploy-prod.yml
 │
-├── tests/                             # Automated tests
-│   ├── integration/
-│   ├── unit/
+├── docs/                                  # Documentation
+│   ├── api/                               # API documentation
+│   ├── architecture/                      # Architecture diagrams
+│   ├── development/                       # Development guides
 │
-├── .env                               # Environment variables
-├── .gitignore                         # Git ignore file
-├── README.md                          # Project overview
+├── .env.example                           # Example environment variables
+├── .gitignore                             # Git ignore file
+├── README.md                              # Project overview
+├── CONTRIBUTING.md                        # Guidelines for contributing
+├── LICENSE                                # License information
+```
+
+This structure includes:
+
+1. **Backend microservices** with dedicated services for core functionalities
+2. **Payment service** with integrations for ABA and Bakong
+3. **Frontend apps** for riders, drivers, and admin dashboard
+4. **Shared libraries** for both frontend and backend
+5. **Infrastructure** configuration for Docker and Kubernetes
+6. **CI/CD pipeline** setup using GitHub Actions
+7. **Documentation** for API, architecture, and development guides
+
 ```
 
 ## Setup Instructions
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/sisovin/ride-request-system.git
+   git clone https://github.com/githubnext/workspace-blank.git
    cd ride-request-system
    ```
 
@@ -212,4 +275,3 @@ ride-request-system/
 - [Architecture](docs/architecture.md)
 - [API Specifications](docs/api-spec.md)
 - [Kafka Events](docs/kafka-events.md)
-```
